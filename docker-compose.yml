@@ -13,11 +13,14 @@ services:
       MYSQL_PASSWORD: chnage_it
     networks:
       - wpsite  
-    
+    healthcheck:
+      test: "/etc/init.d/mysql status"
+      interval: 10s
+      retries: 3
+
   wordpress:
-    depends_on:
+    depends_on:  
       - db
-        #  build: .
     image: wp:latest
     volumes:
       - wp-content:/var/www/html/wp-content
@@ -29,8 +32,13 @@ services:
       WORDPRESS_DB_USER: wp_user
       WORDPRESS_DB_PASSWORD: change_it
       WORDPRESS_DB_NAME: wordpress
+    healthcheck:
+      test: "wget -O /dev/null http://localhost || exit 1"
+      interval: 10s
+      retries: 3  
     networks:
       - wpsite
+
 volumes:
   db_data: {}
   wp-content: {}
